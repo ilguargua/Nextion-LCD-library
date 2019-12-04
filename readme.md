@@ -30,9 +30,9 @@ glitch in the data, not discovered yet why.
 
 # TODO
 
-(...and problably never done)
+(...and problably never will be done)
 
-- Professiional display support
+- Professional display support
 - Eeprom support
 - Touch drawing support
 
