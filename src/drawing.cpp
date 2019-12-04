@@ -196,7 +196,7 @@ uint8_t NxtLcd::clearWaveCh(uint8_t waveId, uint8_t ch){
 #ifdef ARDUINO_ARCH_AVR
     snprintf_P((char *)sendBuf,NXT_BUF_SIZE,PSTR("cle %u,%u%c%c%c"),waveId,ch,NXT_MSG_END);
 #else    
-    snprintf((char *)sendBuf,NXT_BUF_SIZE,"add %u,%u%c%c%c",waveId,ch,NXT_MSG_END);
+    snprintf((char *)sendBuf,NXT_BUF_SIZE,"cle %u,%u%c%c%c",waveId,ch,NXT_MSG_END);
 #endif    
     return writeBuf();    
 }
