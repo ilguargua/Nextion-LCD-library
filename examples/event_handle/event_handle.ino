@@ -50,7 +50,7 @@ uint8_t waveBuf[150]; //an array to hold value for sine wave
 void setup(){
     lcd.init(38400,nxt_enhanced);  //initializing the display. Use the same baudrate that you set in the editor
     
-    //populating the array with values to show sinw wave
+    //populating the array with values to show sine wave
     uint16_t wc = 0;
     for(double i=1.00; wc<150;i += 0.01){
         double a = sin(M_PI * 2 * 2 * i) * 100;
@@ -67,7 +67,6 @@ void loop(){
     static uint16_t sec = 0;      //value showed in gauge
     static uint32_t waveUpd = 0;  //used for time interval of wave update
     static uint8_t slVal = 0;     //progress bar value  
-//    uint32_t ev = 0;
     static uint8_t wCnt = 0;      //counter for wavw data array
     nxtEvent_t evData;            //struct to hold incoming events
     
