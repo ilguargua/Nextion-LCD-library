@@ -13,24 +13,91 @@
 #ifndef __NXT_LCD_H__
 #define __NXT_LCD_H__
 
-#include <SoftwareSerial.h>
+#if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_PIC32) || defined(ARDUINO_ARCH_ESP8266)
+#define NXT_HAVE_SS 1
+#endif
+
+// sam USARTClass
+// samd Uart
+// esp32 HardwareSerial
+// esp8266 HardwareSerial
+
+#if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_PIC32) || defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)
 #include <HardwareSerial.h>
+#define NXT_HAVE_HS 1
+#endif
+
+#if defined(ARDUINO_ARCH_SAM)
+#include <USARTClass.h>
+#endif
+
+
+#ifdef NXT_HAVE_SS
+#include <SoftwareSerial.h>
+#endif
+
+#if defined(ARDUINO_ARCH_SAMD)
+#include <Uart.h>
+#endif
 
 
 //anyserial - a small wrapper to use indifferently hardware or software serial
 class anySerial{
 private:
-    HardwareSerial*     hwSerial;
+#ifdef NXT_HAVE_SS
     SoftwareSerial*     swSerial;
+#else
+    void*               swSerial=NULL;
+#endif
+#ifdef NXT_HAVE_HS
+    HardwareSerial*     hwSerial;
+#endif
+#if defined(ARDUINO_ARCH_SAM)
+    USARTClass*     hwSerial;    
+#endif
+#if defined(ARDUINO_ARCH_SAMD)
+    Serial_*     hwSerial;    
+#endif
+    
 public:
     anySerial(void){};
+#ifdef NXT_HAVE_HS
     void   init(HardwareSerial* port){hwSerial=port;swSerial=NULL;};
+#endif
+#if defined(ARDUINO_ARCH_SAM)
+    void   init(USARTClass* port){hwSerial=port;};    
+#endif
+#if defined(ARDUINO_ARCH_SAMD)
+    void   init(Serial_* port){hwSerial=port;};    
+#endif
+#ifdef NXT_HAVE_SS    
     void   init(SoftwareSerial* port){hwSerial=NULL;swSerial=port;};
+#endif
+#ifdef NXT_HAVE_SS        
     void   begin(uint32_t baud){if(hwSerial) hwSerial->begin(baud);else swSerial->begin(baud);};
+#else
+    void   begin(uint32_t baud){hwSerial->begin(baud);};
+#endif
+#ifdef NXT_HAVE_SS
     void   end(void){if(hwSerial) hwSerial->end();else swSerial->end();};
+#else
+    void   end(void){hwSerial->end();};
+#endif
+#ifdef NXT_HAVE_SS
     int    available(void){if(hwSerial) return hwSerial->available();else return swSerial->available();};
+#else
+    int    available(void){return hwSerial->available();};
+#endif
+#ifdef NXT_HAVE_SS
     int    read(void){if(hwSerial) return hwSerial->read();else return swSerial->read();};
-    size_t write(const char* b, size_t s){if(hwSerial) return hwSerial->write(b,s);else return swSerial->write(b,s);};
+#else
+    int    read(void){return hwSerial->read();};
+#endif
+#ifdef NXT_HAVE_SS
+    size_t write(const unsigned char* b, size_t s){if(hwSerial) return hwSerial->write(b,s);else return swSerial->write(b,s);};
+#else
+    size_t write(const unsigned char* b, size_t s){return hwSerial->write(b,s);};
+#endif
 };
 
 
@@ -50,11 +117,11 @@ public:
 #define NXT_PROP_SIZE             7
 
 
-
+/*
 void serialLogStr(const char *msg, const char *value = NULL);
 void serialLogInt(const char *msg, const int32_t value);
 void serialLogHex(const char *msg, const int32_t value);
-
+*/
 
 /*
  * colors value as defined in nextion editor.
@@ -148,6 +215,8 @@ typedef enum {
 
 /*
  * code returned from display in reply of commands
+ * see https://nextion.tech/instruction-set/#s7
+ * for a complete list
 */
 typedef enum {
     cmdFail =           0x00,
@@ -235,7 +304,11 @@ typedef struct {
 
 class NxtLcd{
 private:
+//#ifdef NXT_HAVE_SS    
     anySerial           serial;
+//#else
+//    HardwareSerial      serial;
+//#endif
     uint8_t             initialized;
     uint8_t             debug;
     uint8_t             sendBuf[NXT_BUF_SIZE];
@@ -265,10 +338,18 @@ public:
      * Please note : all functions return a readCode_t value, that must to be
      * checked by user, at least if you want to know if command is succesful or not.
     */
-    
+#ifdef NXT_HAVE_HS    
     NxtLcd(HardwareSerial* port);
+#endif
+#if defined(ARDUINO_ARCH_SAM)
+    NxtLcd(USARTClass* port);
+#endif
+#if defined(ARDUINO_ARCH_SAMD)
+    NxtLcd(Serial_* port);
+#endif
+#ifdef NXT_HAVE_SS        
     NxtLcd(SoftwareSerial* port);
-
+#endif
     
     uint8_t     init(uint32_t baudrate = 9600, uint8_t dispType = 1, uint8_t reset = 1, uint8_t dbg = 1);
 
