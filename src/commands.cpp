@@ -73,7 +73,7 @@ uint8_t NxtLcd::refresh(uint8_t obj){
 /*
  *  click() - Invoke the press (ev=1) or release (ev=0) event on component "obj"
  *  Note that if you use click on an object (e.g. button), the code wrote in the editor for 
- *  such event will be executed (e.g. page change), but the vent will not be notified back,
+ *  such event will be executed (e.g. page change), but the event will not be notified back,
  *  even if 'send event id' is marked. "obj" can be object name or id a must be on current page.
  */
 uint8_t NxtLcd::click(const char* obj, uint8_t ev){
@@ -101,9 +101,9 @@ uint8_t NxtLcd::click(uint8_t obj, uint8_t ev){
 }
 
 /*
- *  touchEn() - enabele (en=1) or disable(en=0) the touch feature of an object. "obj"
+ *  touchEn() - enable (en=1) or disable(en=0) the touch feature of an object. "obj"
  *  can be object name or id, and must be on current page. If id=0 the whole page touch
- *  abilities will be enebled or disabled.
+ *  abilities will be enabled or disabled.
  */
 uint8_t NxtLcd::touchEn(const char* obj, uint8_t en){
     if(initialized == 0) return notInit;

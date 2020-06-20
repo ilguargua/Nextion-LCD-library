@@ -49,19 +49,39 @@
  * uint8_t res = lcd.init(); //init class with 9600 baudrate, dev. reset and debug on
  * ********************************************************************************************************
  */
+
+#ifdef NXT_HAVE_HS
 NxtLcd::NxtLcd(HardwareSerial *port){
     serial.init(port);
     initialized = 0;
     haveEvent = 0;
 }
+#endif
+
+#if defined(ARDUINO_ARCH_SAM)
+NxtLcd::NxtLcd(USARTClass *port){
+    serial.init(port);
+    initialized = 0;
+    haveEvent = 0;
+}
+#endif
+
+#if defined(ARDUINO_ARCH_SAMD)
+NxtLcd::NxtLcd(Serial_ *port){
+    serial.init(port);
+    initialized = 0;
+    haveEvent = 0;
+}
+#endif
 
 
+#ifdef NXT_HAVE_SS
 NxtLcd::NxtLcd(SoftwareSerial *port){
     serial.init(port);
     initialized = 0;
     haveEvent = 0;
 }
-
+#endif
 /*****************************************************************************************************
  * init() - initialize serial port with baudrate indicated, doing an optional reset and setting
  * debug (dbg=1) or not (dbg=0). Almost of the commands, if succesful, does not return anything
@@ -78,7 +98,7 @@ uint8_t NxtLcd::init(uint32_t bauds, uint8_t dspType, uint8_t reset, uint8_t dbg
     initialized = 1;
     dispType = dspType;
     debug = dbg;
-    uint8_t res;
+    uint8_t res = replyCmdFail;
     uint8_t propCnt = getPropCnt();
     if(reset) res = devReset();
     if(res != replyCmdOk) return res;
@@ -167,7 +187,7 @@ uint8_t NxtLcd::writeBuf(uint8_t expReply, uint16_t wait,uint16_t size){
     readEvent();
     if( size == 0){
         if(strlen((char *)sendBuf) > 0){
-            serial.write((char *)sendBuf,strlen((char *)sendBuf));
+            serial.write((unsigned char *)sendBuf,strlen((char *)sendBuf));
             if(expReply > 0 || debug > 0){
                 delay(wait); 
             }
@@ -176,7 +196,7 @@ uint8_t NxtLcd::writeBuf(uint8_t expReply, uint16_t wait,uint16_t size){
         else return invalidData;
     }
     else{
-        size_t sent = serial.write((char *)sendBuf,size);
+        size_t sent = serial.write((unsigned char *)sendBuf,size);
         if(sent != size) return replyCmdFail;
         if(expReply > 0 || debug > 0){
             delay(wait); 

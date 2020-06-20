@@ -236,7 +236,7 @@ uint8_t NxtLcd::writeStr(const __FlashStringHelper* msg, uint16_t x,uint16_t y,u
     bufReset(sendBuf);
     snprintf_P((char *)sendBuf,NXT_BUF_SIZE,PSTR("xstr %u,%u,%u,%u,%u,%u,%u,%u,%u,1,\"%S\"%c%c%c"),x,y,w,h,
              font,fCol,bCol,xCen,yCen,msg,NXT_MSG_END);
-    serialLogInt("xstr pgm, msg len",strlen_P((char *)msg));
+    //serialLogInt("xstr pgm, msg len",strlen_P((char *)msg));
     return writeBuf();
 }   
 
